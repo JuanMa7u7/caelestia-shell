@@ -141,6 +141,10 @@ in
       mkdir -p $out/lib
       ln -s ${extras}/lib/* $out/lib/
 
+      # Install wayland session desktop file
+      mkdir -p $out/share/wayland-sessions
+      cp assets/wayland-sessions/caelestia-shell.desktop $out/share/wayland-sessions/
+
       # Ensure wrap_term_launch.sh is executable
       chmod 755 $out/share/caelestia-shell/assets/wrap_term_launch.sh
     '';

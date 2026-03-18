@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Caelestia Shell
+Comment=A magical shell experience
+Exec=caelestia-shell
+Type=Wayland
+DesktopNames=CaelestiaShell;
