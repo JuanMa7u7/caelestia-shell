@@ -147,6 +147,7 @@ in
 
     passthru = {
       inherit plugin extras;
+      providedSessions = [ "caelestia-shell" ];
     };
 
     meta = {
