@@ -143,7 +143,7 @@ in
 
       # Install wayland session desktop file
       mkdir -p $out/share/wayland-sessions
-      cp assets/wayland-sessions/caelestia-shell.desktop $out/share/wayland-sessions/
+      cp $src/assets/wayland-sessions/caelestia-shell.desktop $out/share/wayland-sessions/
 
       # Ensure wrap_term_launch.sh is executable
       chmod 755 $out/share/caelestia-shell/assets/wrap_term_launch.sh
