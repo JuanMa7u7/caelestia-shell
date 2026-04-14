@@ -3,6 +3,66 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+{
+  description = "Desktop shell for Caelestia dots";
+
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
+    quickshell = {
+      url = "git+https://git.outfoxxed.me/outfoxxed/quickshell?rev=1ddb355121484bcac70f49edd4bd006b1d3a753e";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    caelestia-cli = {
+      url = "github:JuanMa7u7/cli";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.caelestia-shell.follows = "";
+    };
+  };
+
+  outputs = {
+    self,
+    nixpkgs,
+    ...
+  } @ inputs: let
+    forAllSystems = fn:
+      nixpkgs.lib.genAttrs nixpkgs.lib.platforms.linux (
+        system: fn nixpkgs.legacyPackages.${system}
+      );
+  in {
+    formatter = forAllSystems (pkgs: pkgs.alejandra);
+
+    packages = forAllSystems (pkgs: rec {
+      caelestia-shell = pkgs.callPackage ./nix {
+        rev = self.rev or self.dirtyRev;
+        stdenv = pkgs.clangStdenv;
+        quickshell = inputs.quickshell.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
+          withX11 = false;
+          withI3 = false;
+        };
+        caelestia-cli = inputs.caelestia-cli.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      };
+      with-cli = caelestia-shell.override {withCli = true;};
+      debug = caelestia-shell.override {debug = true;};
+      default = caelestia-shell;
+    });
+
+    devShells = forAllSystems (pkgs: {
+      default = let
+        shell = self.packages.${pkgs.stdenv.hostPlatform.system}.caelestia-shell;
+      in
+        pkgs.mkShell.override {stdenv = shell.stdenv;} {
+          inputsFrom = [shell shell.plugin shell.extras];
+          packages = with pkgs; [clazy material-symbols rubik nerd-fonts.caskaydia-cove];
+          CAELESTIA_XKB_RULES_PATH = "${pkgs.xkeyboard-config}/share/xkeyboard-config-2/rules/base.lst";
+        };
+    });
+
+    homeManagerModules.default = import ./nix/hm-module.nix self;
+  };
+}
+
 
     quickshell = {
       # url = "git+https://git.outfoxxed.me/outfoxxed/quickshell?rev=1ddb355121484bcac70f49edd4bd006b1d3a753e";
